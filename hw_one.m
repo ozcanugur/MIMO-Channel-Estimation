@@ -36,16 +36,20 @@ ylabel('MSE');
 %% 
 clear
 
+
 N = 5;
 SNRdb = -10:2:30;
-Q = linspace(1, 50, N);
+%Q = linspace(1, 50, N);
+Q = 10;
 alpha = linspace(0, .99, N);
 beta = 0.9;
 M = 4;
 
+bits = randi(2,1,1e3)-1;
+training_bits = bits(1:Q);
+
 SNR = db2pow(SNRdb);
 
-bits = randi(2,1,10)-1;
 
 for i=1:M
     for j=1:M
@@ -54,3 +58,7 @@ for i=1:M
         end
     end
 end
+
+
+H_est = ones(M,M)
+
