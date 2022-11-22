@@ -225,13 +225,12 @@ end
 % end 
 for r = 1:length(rho)
     for q = 1:length(Q)
-        CW{r,q} = toeplitz([1, zeros(1,Q(q)-2+K), rho(r), zeros(1,Q(q)-2+K), rho(r)^2, zeros(1,Q(q)-2+K), rho(r)^3, zeros(1,Q(q)-2+K)]);
+        CW{r,q} = toeplitz([1, zeros(1,Q(q)-1+K), rho(r).*ones(1,K), zeros(1,Q(q)-1), rho(r)^2.*ones(1,K), zeros(1,Q(q)-1), rho(r)^3.*ones(1,K), zeros(1,Q(q)-1)]);
     end
 end
 
 
-IT = 20
-status = 0
+IT = 2
 for s = 1:length(SNR)
     for a = 1:length(alpha)
         for q = 1:length(Q)
@@ -255,10 +254,7 @@ for s = 1:length(SNR)
 
             end
         end
-        if it*s*a*q/(length(Q)*length(SNR)*length(alpha)*IT)*100>status
-            status = it*s*a*q/(length(Q)*length(SNR)*length(alpha)*IT)*100;
-        end
-        disp(status)
+        disp(it*s*a*q/(length(Q)*length(SNR)*length(alpha)*IT))
     end
 end
 
