@@ -170,7 +170,7 @@ hold on
 % loglog(SNR,CRBa,"DisplayName","CRBa")
 
 
-%%
+%% deneme3 
 
 N = size(X',1);
 M = size(X',2);
