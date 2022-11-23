@@ -270,3 +270,91 @@ err = mean(err_mle,4);
 loglog(SNR,reshape(err(:,4,:),21,5))
 hold on
 % loglog(SNR,CRB2,"DisplayName","CRB")
+
+
+%% 
+clear
+clc
+
+P = 201;
+Q = linspace(10, P-1, 20);
+rho=.1;
+alpha=.5;
+
+
+
+SNRdb = -10:2:30;
+beta = 0.99;
+M = 4;
+K = 1;
+
+SNR = 10.^(SNRdb/10);
+
+
+for i=1:M
+    for j=1:M
+        for a=1:length(alpha)
+            for k=1:K
+                H{a}(i,j,k) = alpha(a)^(abs(i-j))*beta^(k);
+            end
+        end
+    end
+end
+
+
+
+for input=1:M       
+    for output=1:M  
+        C(output,input)=rho^(abs(output-input));
+    end
+end
+
+
+CW2 = toeplitz([1, zeros(1,P-1), rho, zeros(1,P-1), rho^2, zeros(1,P-1), rho^3, zeros(1,P-1)]);
+
+
+for s = 1:length(SNR)
+    for q = 20 %1:length(Q)
+        CW = toeplitz([1, zeros(1,Q(q)-1), rho, zeros(1,Q(q)-1), rho^2, zeros(1,Q(q)-1), rho^3, zeros(1,Q(q)-1)]);
+        for it = 1:1
+            Xall = sqrt(SNR(s)).*randn(M,P);
+            X = Xall(:,1:Q(q));
+            x = X(:);
+            xall = Xall(:);
+            h = H{a}(:);
+            Wall = sqrtm(C) * randn(M, P);
+            W = Wall(:,1:Q(q));
+            w = reshape(W',[numel(W) 1]);
+            wall = reshape(Wall',[numel(Wall) 1]);
+            X_bp = kron(eye(4),X');
+            X_bpall = kron(eye(M),Xall');
+            
+            y = X_bp*h + w;
+
+            h_mle = (X_bp'*(CW\X_bp))\(X_bp'*(CW\y));
+            H_est = reshape(h_mle,[4 4]);
+            %                 x_zf = y_all*pinv(h);
+            %                 err_zf(q,s,a,it) = mean(mean((x_zf - X_bpall).^2));
+
+
+            %HH = kron(eye(Q(q)),H_est');
+            HHall = kron(eye(P),H_est');
+            HHdn = kron(eye(P),H{a}');
+            %y2 = HH*x+w;
+            y_all2 = HHall*xall+wall;
+            x_mle = (HHall'*(CW2\HHall))\(HHall'*(CW2\y_all2));
+            err_mle(q,s,it) = mean(mean((x_mle - xall).^2));
+            CC=sqrt(SNR(s))*eye(size(HHall));
+%             x_mmse = CC*HHall'*inv(HHall*CC*HHall'+CW2)*y_all2;
+            x_mmse = inv(HHall'*inv(CW2)*HHall+inv(CC))*HHall'*(CW2\y_all2);
+            err_mmse(q,s,it) = mean(mean((x_mmse - xall).^2));
+            x_dn = inv(HHdn'*inv(CW2)*HHdn)*(HHdn'*(CW2\y_all2));
+            err_dn(q,s,it) = mean(mean((x_dn - xall).^2));
+        end
+    end
+
+end
+%%
+loglog(SNR,mean(err_dn,3))
+hold on
+loglog(SNR,mean(err_mle,3))
