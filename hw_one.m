@@ -1,10 +1,10 @@
 % ADSP - HW1
 % Ugur Ozcan
 
+%% 1.1 Noise Generation
+
 clear all
 clc
-
-%% 1.1 Noise Generation
 
 N = 4;
 M = 4;
@@ -27,17 +27,19 @@ for i = 1 : length(rho)
     end
 end
 
-figure; hold on
-plot(L, mean(mse(1,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(1))))
-plot(L, mean(mse(5,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(5))))
-plot(L, mean(mse(10,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(10))))
+figure; 
+loglog(L, mean(mse(1,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(1))))
+hold on
+loglog(L, mean(mse(5,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(5))))
+loglog(L, mean(mse(10,:,:),3).', 'LineWidth', 2, "DisplayName",strcat("\rho=",string(rho(10))))
 xlabel('Number of samples [L]');
 ylabel('MSE');
 grid
 legend
 
-figure; hold on
+figure;
 plot(rho, mean(mse(:,1,:),3), 'LineWidth', 2, "DisplayName",strcat("L=",string(L(1))))
+hold on
 plot(rho, mean(mse(:,5,:),3), 'LineWidth', 2, "DisplayName",strcat("L=",string(L(5))))
 plot(rho, mean(mse(:,10,:),3), 'LineWidth', 2, "DisplayName",strcat("L=",string(L(10))))
 xlabel('Correlation coefficient [\rho]');
@@ -354,7 +356,7 @@ for s = 1:length(SNR)
                 X_ml = (H_est'*(Cw\H_est))\(H_est'*(Cw\Y));
                 
                 % Winer Filter (LMMSE)
-                X_mmse = (H_est'*(Cw\H_est)+eye(M))\(H'*(Cw\Y));
+                X_mmse = (H_est'*(Cw\H_est)+eye(M))\(H_est'*(Cw\Y));
                 
                 % Least Squares Estimator (LS)
                 X_ls = H\Y;
